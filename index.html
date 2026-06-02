@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>文洲系统清理大师 - 官方网站</title>
-    <meta name="referrer" content="no-referrer"> <!-- 解决GitHub跨域 -->
+    <meta name="referrer" content="no-referrer">
     <style>
         * {
             margin: 0;
@@ -19,7 +19,6 @@
             overflow-y: auto;
         }
 
-        /* 3D星空背景 */
         #stars {
             position: fixed;
             top: 0;
@@ -58,7 +57,6 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
-        /* 顶部大标题 */
         .main-title {
             font-size: 88px;
             font-weight: 900;
@@ -97,7 +95,6 @@
             text-align: center;
         }
 
-        /* 毛玻璃版本卡片 */
         .version-box {
             position: relative;
             background: rgba(255, 255, 255, 0.08);
@@ -143,7 +140,6 @@
         .time { color: #7a8a9e; font-size: 20px; text-align: center; }
         .desc { font-size: 24px; color: #e2e8f0; line-height: 2; margin-bottom: 60px; text-align: center; }
 
-        /* 毛玻璃更新日志 */
         .update-log {
             position: relative;
             background: rgba(0, 0, 0, 0.15);
@@ -165,7 +161,6 @@
         .update-log li { list-style: none; padding: 15px 0; color: #cbd5e1; padding-left: 40px; font-size: 22px; line-height: 1.6; position: relative; }
         .update-log li::before { content: "•"; color: #00d4ff; position: absolute; left: 0; font-size: 30px; top:12px; }
 
-        /* 毛玻璃说明框 */
         .note-box {
             position: relative;
             background: rgba(251, 191, 36, 0.1);
@@ -194,7 +189,6 @@
         .note-box p, .note-box li { font-size:21px; line-height:2.2; margin-bottom:15px; }
         .note-box strong { color:#fff; }
 
-        /* 毛玻璃下载按钮 */
         .download-btn {
             position: relative;
             display: block;
@@ -225,7 +219,6 @@
         @keyframes btnFlow { 0%{background-position:0% 50%}100%{background-position:400% 50%} }
         .download-btn:hover { transform: translateY(-8px); box-shadow: 0 20px 70px rgba(14,165,233,0.6); }
 
-        /* 版权信息 */
         .author {
             margin-top: 20px;
             color: #647896;
@@ -238,7 +231,6 @@
             backdrop-filter: blur(10px);
         }
 
-        /* 移动端适配 */
         @media (max-width: 600px) {
             body { padding:40px 15px 60px; }
             .main-title { font-size:58px; }
@@ -291,8 +283,8 @@
             <p>谢谢大家支持小学生开发！放心使用~</p>
         </div>
 
-        <!-- 去掉target="_blank"，直接本页下载exe不跳转Release页面 -->
-        <a id="downloadBtn" href="https://github.com/VNeoByteDev/wenzhou-cleanmaster/releases/latest" class="download-btn">📥 立即下载最新版</a>
+        <!-- 移除href，JS控制直接下载 -->
+        <a id="downloadBtn" class="download-btn">📥 立即下载最新版</a>
 
         <div class="author">
             作者：王文洲<br>
@@ -301,17 +293,14 @@
     </div>
 
     <script>
-        // ==============================================
-        // 适配GitHub部署：双策略获取版本（API + 降级）
-        // ==============================================
         const GITHUB_API = "https://gh-proxy.com/https://api.github.com/repos/VNeoByteDev/wenzhou-cleanmaster/releases";
-        const RELEASE_URL = "https://github.com/VNeoByteDev/wenzhou-cleanmaster/releases";
-        const LATEST_RELEASE_URL = "https://github.com/VNeoByteDev/wenzhou-cleanmaster/releases/latest";
         const DOWNLOAD_BTN = document.getElementById("downloadBtn");
         const VERSION_TEXT = document.getElementById("latest-version");
-        const FALLBACK_VERSION = "4.0.4"; // 兜底版本号
+        const FALLBACK_VERSION = "4.0.4";
+        // v4.0.4固定兜底直链
+        const FALLBACK_DOWNLOAD_URL = "https://github.com/VNeoByteDev/wenzhou-cleanmaster/releases/download/v4.0.4/Setup_文洲系统清理大师_v4.0.4.exe";
+        let realDownloadUrl = FALLBACK_DOWNLOAD_URL;
 
-        // 版本号对比函数
         function compareVersions(verA, verB) {
             const a = verA.split('.').map(Number);
             const b = verB.split('.').map(Number);
@@ -322,17 +311,16 @@
             return 0;
         }
 
-        // 异步获取最新版本（带代理+超时）
+        // 点击按钮直接打开下载链接
+        DOWNLOAD_BTN.onclick = function(){
+            window.open(realDownloadUrl,"_self");
+        }
+
         async function loadLatestVersion() {
-            // 先设置兜底值，避免加载失败显示异常
             VERSION_TEXT.textContent = `最新版本：v${FALLBACK_VERSION}`;
-            DOWNLOAD_BTN.href = LATEST_RELEASE_URL;
-
             try {
-                // 带超时的请求（防止卡死）
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时
-
+                const timeoutId = setTimeout(() => controller.abort(), 8000);
                 const res = await fetch(GITHUB_API, {
                     signal: controller.signal,
                     headers: {
@@ -341,12 +329,9 @@
                     }
                 });
                 clearTimeout(timeoutId);
-
                 if (!res.ok) throw new Error("API请求失败");
                 const releases = await res.json();
                 const fileList = [];
-
-                // 筛选安装包
                 releases.forEach(release => {
                     if (release.assets && release.assets.length > 0) {
                         release.assets.forEach(asset => {
@@ -360,33 +345,22 @@
                         });
                     }
                 });
-
-                // 排序选最新
                 if (fileList.length > 0) {
                     fileList.sort((a, b) => compareVersions(a.version, b.version));
                     const latest = fileList[0];
                     VERSION_TEXT.textContent = `最新版本：v${latest.version}`;
-                    DOWNLOAD_BTN.href = latest.url;
+                    realDownloadUrl = latest.url;
                 }
-
             } catch (err) {
-                // 失败时保持兜底值，不显示错误
-                console.log("版本检测超时/失败，使用兜底版本");
+                console.log("版本检测失败，使用兜底下载地址");
             }
         }
 
-        // 页面加载后执行（GitHub Pages加载完成后再请求）
         if (window.location.hostname !== "localhost" && !window.location.href.startsWith("file://")) {
-            // 非本地环境（GitHub Pages）：延迟1秒请求，避免加载冲突
             setTimeout(loadLatestVersion, 1000);
-        } else {
-            // 本地环境：直接用兜底版本，不请求API
-            console.log("本地环境，使用兜底版本");
         }
 
-        // ==============================================
-        // 3D动态星空：1500→450，减少粒子防卡顿
-        // ==============================================
+        // 3D星空代码不变
         const stars = document.getElementById('stars');
         const ctx = document.createElement('canvas').getContext('2d');
         stars.appendChild(ctx.canvas);
@@ -422,11 +396,8 @@
                 }
             }
         }
-
-        // 星星从1500改成450
         const starArray = [];
         for(let i=0;i<450;i++) starArray.push(new Star());
-
         function animateStars() {
             ctx.fillStyle = 'rgba(9,10,15,0.1)';
             ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
@@ -434,7 +405,6 @@
             requestAnimationFrame(animateStars);
         }
         animateStars();
-
         window.addEventListener('resize',()=>{
             ctx.canvas.width=window.innerWidth;
             ctx.canvas.height=window.innerHeight;
