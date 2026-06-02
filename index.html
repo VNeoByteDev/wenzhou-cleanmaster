@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>文洲系统清理大师 - 官方网站</title>
+    <meta name="referrer" content="no-referrer"> <!-- 解决GitHub跨域 -->
     <style>
         * {
             margin: 0;
@@ -11,134 +12,255 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        /* 3D星空背景 */
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+        }
+
         body {
-            font-family: "Microsoft YaHei", sans-serif;
-            background: linear-gradient(135deg, #10141c, #1a2130);
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
             color: #fff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
+            min-height: 120vh;
+            display: block;
+            padding: 60px 20px 80px;
+            position: relative;
         }
 
         .container {
-            max-width: 700px;
+            max-width: 900px;
             width: 100%;
+            margin: 0 auto;
+            animation: fadeInUp 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            z-index: 2;
+            padding: 20px 0;
+            background: rgba(255, 255, 255, 0.02);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+        }
+
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 顶部大标题 */
+        .main-title {
+            font-size: 88px;
+            font-weight: 900;
+            background: linear-gradient(90deg, #00d4ff, #10b981, #ff0080, #00d4ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+            text-shadow: 0 0 40px rgba(0,212,255,0.9), 0 0 80px rgba(16,185,129,0.6);
+            letter-spacing: 6px;
+            line-height: 1.2;
+            animation: titleGlow 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite alternate;
+            text-align: center;
+        }
+
+        @keyframes titleGlow {
+            0% { filter: brightness(1) drop-shadow(0 0 30px #00d4ff); }
+            100% { filter: brightness(1.3) drop-shadow(0 0 50px #00d4ff); }
         }
 
         .logo {
-            font-size: 42px;
-            font-weight: bold;
-            color: #00ddff;
-            margin-bottom: 10px;
-            text-shadow: 0 0 15px #00ddff;
-        }
-
-        .title {
-            font-size: 22px;
-            color: #ccc;
+            font-size: 48px;
+            font-weight: 700;
+            color: #ffffff;
             margin-bottom: 30px;
+            text-shadow: 0 0 25px rgba(255,255,255,0.4);
+            text-align: center;
         }
 
-        .version-box {
-            background: rgba(255,255,255,0.08);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            border: 1px solid #00ddff;
+        .title-desc {
+            font-size: 32px;
+            color: #a8b3cf;
+            margin-bottom: 80px;
+            letter-spacing: 3px;
+            font-weight: 300;
+            text-align: center;
         }
+
+        /* 毛玻璃版本卡片 */
+        .version-box {
+            position: relative;
+            background: rgba(255, 255, 255, 0.08);
+            -webkit-backdrop-filter: blur(30px);
+            backdrop-filter: blur(30px);
+            padding: 45px 35px;
+            border-radius: 24px;
+            border-top-left-radius: 28px;
+            border-bottom-right-radius: 28px;
+            margin-bottom: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 212, 255, 0.1);
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            overflow: hidden;
+        }
+
+        .version-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, #00d4ff, #10b981, #00d4ff);
+            z-index: -1;
+            margin: -2px;
+            border-radius: 26px;
+            border-top-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            opacity: 0;
+            animation: borderGlow 6s infinite;
+        }
+
+        .version-box:hover::before { opacity: 1; }
+        .version-box:hover { transform: translateY(-6px); box-shadow: 0 15px 40px rgba(0, 212, 255, 0.2); }
+        @keyframes borderGlow { 0%{opacity:0.2}50%{opacity:0.6}100%{opacity:0.2} }
 
         .version {
-            font-size: 26px;
-            color: #00ff88;
-            margin-bottom: 8px;
+            font-size: 42px;
+            color: #10b981;
+            margin-bottom: 15px;
+            font-weight: 900;
+            text-align: center;
         }
 
-        .time {
-            color: #aaa;
-            font-size: 16px;
-        }
+        .time { color: #7a8a9e; font-size: 20px; text-align: center; }
+        .desc { font-size: 24px; color: #e2e8f0; line-height: 2; margin-bottom: 60px; text-align: center; }
 
-        .desc {
-            font-size: 18px;
-            color: #eee;
-            line-height: 1.7;
-            margin-bottom: 25px;
-        }
-
+        /* 毛玻璃更新日志 */
         .update-log {
-            text-align: left;
-            background: rgba(0,0,0,0.2);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.15);
+            -webkit-backdrop-filter: blur(30px);
+            backdrop-filter: blur(30px);
+            padding: 45px 35px;
+            border-radius: 20px;
+            border-top-right-radius: 24px;
+            border-bottom-left-radius: 24px;
+            margin-bottom: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 5px solid #00d4ff;
+            box-shadow: 0 8px 32px rgba(0, 212, 255, 0.1);
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
-        .update-log h3 {
-            color: #00ddff;
-            margin-bottom: 12px;
-            font-size: 20px;
-        }
+        .update-log:hover { transform: translateY(-4px); box-shadow: 0 15px 40px rgba(0, 212, 255, 0.15); }
+        .update-log h3 { color: #00d4ff; margin-bottom: 30px; font-size: 32px; font-weight: 700; }
+        .update-log li { list-style: none; padding: 15px 0; color: #cbd5e1; padding-left: 40px; font-size: 22px; line-height: 1.6; position: relative; }
+        .update-log li::before { content: "•"; color: #00d4ff; position: absolute; left: 0; font-size: 30px; top:12px; }
 
-        .update-log li {
-            list-style: none;
-            padding: 6px 0;
-            color: #ddd;
-        }
-
-        /* 五年级说明 + 安全提示 */
+        /* 毛玻璃说明框 */
         .note-box {
-            background: rgba(255,220,0,0.15);
-            border: 1px solid #ffdd00;
-            padding: 18px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            text-align: left;
-            color: #fff;
+            position: relative;
+            background: rgba(251, 191, 36, 0.1);
+            -webkit-backdrop-filter: blur(30px);
+            backdrop-filter: blur(30px);
+            padding: 45px 35px;
+            border-radius: 20px;
+            border-top-right-radius: 26px;
+            border-bottom-left-radius: 26px;
+            margin-bottom: 80px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(251, 191, 36, 0.1);
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            overflow: hidden;
         }
 
-        .note-box h3 {
-            color: #ffdd00;
-            margin-bottom: 10px;
-            font-size: 18px;
+        .note-box::before {
+            content: ''; position: absolute; top:0;left:0;right:0;bottom:0;
+            background: linear-gradient(90deg, #fbbf24, #ff6b35, #fbbf24);
+            z-index: -1; margin:-2px; border-radius:22px; opacity:0; animation: noteBorderGlow 6s infinite;
         }
+        .note-box:hover::before { opacity:1; }
+        .note-box:hover { transform: translateY(-4px); box-shadow: 0 15px 40px rgba(251, 191, 36, 0.15); }
+        @keyframes noteBorderGlow { 0%{opacity:0.2}50%{opacity:0.6}100%{opacity:0.2} }
+        .note-box h3 { color: #fbbf24; margin-bottom:25px; font-size:30px; }
+        .note-box p, .note-box li { font-size:21px; line-height:2.2; margin-bottom:15px; }
+        .note-box strong { color:#fff; }
 
+        /* 毛玻璃下载按钮 */
         .download-btn {
-            display: inline-block;
-            background: linear-gradient(90deg, #00aaff, #00ff88);
-            color: #000;
-            font-weight: bold;
-            font-size: 24px;
-            padding: 18px 50px;
-            border-radius: 50px;
+            position: relative;
+            display: block;
+            width: fit-content;
+            margin: 0 auto 80px;
+            background: linear-gradient(90deg, #0ea5e9, #10b981, #ff0080, #0ea5e9);
+            background-size: 400% 400%;
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            color: #fff;
+            font-weight: 900;
+            font-size: 42px;
+            padding: 35px 90px;
             text-decoration: none;
-            box-shadow: 0 8px 20px rgba(0,221,255,0.3);
-            transition: 0.3s;
+            border-radius: 80px;
+            border-top-left-radius: 90px;
+            border-bottom-right-radius: 90px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 15px 50px rgba(14,165,233,0.3);
+            animation: btnFlow 8s infinite;
+            outline: none;
+            z-index: 10;
+            cursor: pointer;
+            text-align: center;
         }
 
-        .download-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 25px rgba(0,221,255,0.4);
-        }
+        @keyframes btnFlow { 0%{background-position:0% 50%}100%{background-position:400% 50%} }
+        .download-btn:hover { transform: translateY(-8px); box-shadow: 0 20px 70px rgba(14,165,233,0.6); }
 
+        /* 版权信息 */
         .author {
-            margin-top: 40px;
-            color: #777;
-            font-size: 15px;
+            margin-top: 20px;
+            color: #647896;
+            font-size: 21px;
+            line-height: 2.2;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 30px 0;
+            text-align: center;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 600px) {
+            body { padding:40px 15px 60px; }
+            .main-title { font-size:58px; }
+            .logo { font-size:38px; }
+            .title-desc { font-size:24px; margin-bottom:60px; }
+            .download-btn { font-size:28px; padding:25px 60px; border-radius:60px; }
+            .version-box, .update-log, .note-box { padding:30px 20px; margin-bottom:40px; }
         }
     </style>
 </head>
 
 <body>
+    <div id="stars"></div>
+
     <div class="container">
-        <div class="logo">文洲系统清理大师</div>
-        <div class="title">专业、安全、极速的 Windows 系统优化工具</div>
+        <h1 class="main-title">文洲系统清理大师</h1>
+        <div class="logo">官方正版网站</div>
+        <div class="title-desc">专业、安全、极速的 Windows 优化工具</div>
 
         <div class="version-box">
-            <div class="version">最新版本：v4.0.0</div>
-            <div class="time">初始版本</div>
+            <div class="version" id="latest-version">最新版本：v4.0.4</div>
+            <div class="time">官方自动同步最新版</div>
         </div>
 
         <div class="desc">
@@ -148,31 +270,175 @@
 
         <div class="update-log">
             <h3>📝 更新日志</h3>
-            <li>📌 软件初始正式版本，完整实现全部基础功能</li>
-            <li>📌 界面简洁易用，运行稳定流畅</li>
+            <li>✅ v4.0.4：修复Tkinter兼容问题，优化安装向导</li>
+            <li>✅ v4.0.3：修复检查更新功能，解决国内网络访问问题</li>
+            <li>✅ v4.0.2：优化系统评分算法，提升清理速度</li>
+            <li>✅ v4.0.1：修复已知bug，增加驱动管理功能</li>
+            <li>📌 v4.0.0：软件初始正式版本</li>
         </div>
 
-        <!-- 关键：五年级说明 + 怎么点仍要下载 -->
         <div class="note-box">
             <h3>💡 开发者说明（很重要！）</h3>
             <p>我是<strong>五年级小学生</strong>，这个软件是我自己用 Python 写的。</p>
             <p><strong>为什么会提示“不安全/有风险”？</strong></p>
-            <p>因为我没有钱买微软的数字签名证书，Windows 和浏览器会把没有证书的软件当成“未知软件”，所以会拦。<strong>软件本身完全无毒、无广告、不偷东西。</strong></p>
-            <p><strong>请一定这样操作才能安装：</strong></p>
+            <p>因为我没有钱买微软的数字签名证书，Windows 会拦截未知软件！<strong>软件完全无毒、无广告、不偷数据。</strong></p>
+            <p><strong>安装教程：</strong></p>
             <ul>
-                <li>1. 浏览器提示时：点<strong>“保留”→“仍然保留/仍要下载”</strong></li>
-                <li>2. 运行时提示“Windows 已保护”：点<strong>“更多信息”→“仍要运行”</strong></li>
+                <li>1. 浏览器提示时：点<strong>“保留”→“仍然保留”</strong></li>
+                <li>2. 运行时提示：点<strong>“更多信息”→“仍要运行”</strong></li>
                 <li>3. 安装后：右键软件 → 属性 → 勾选<strong>“解除锁定”</strong></li>
             </ul>
-            <p>谢谢大家支持小学生开发！放心用，安全干净。</p>
+            <p>谢谢大家支持小学生开发！放心使用~</p>
         </div>
 
-        <a href="系统清理大师_setup_4.0.0.exe" class="download-btn">📥 立即官方下载</a>
+        <!-- 双模式下载按钮：优先最新版，兜底仓库地址 -->
+        <a id="downloadBtn" href="https://github.com/VNeoByteDev/wenzhou-cleanmaster/releases/latest" target="_blank" class="download-btn">📥 立即下载最新版</a>
 
         <div class="author">
             作者：王文洲<br>
             版权所有 © 文洲软件开发工作室
         </div>
     </div>
+
+    <script>
+        // ==============================================
+        // 适配GitHub部署：双策略获取版本（API + 降级）
+        // ==============================================
+        const GITHUB_API = "https://gh-proxy.com/https://api.github.com/repos/VNeoByteDev/wenzhou-cleanmaster/releases";
+        const RELEASE_URL = "https://github.com/VNeoByteDev/wenzhou-cleanmaster/releases";
+        const LATEST_RELEASE_URL = "https://github.com/VNeoByteDev/wenzhou-cleanmaster/releases/latest";
+        const DOWNLOAD_BTN = document.getElementById("downloadBtn");
+        const VERSION_TEXT = document.getElementById("latest-version");
+        const FALLBACK_VERSION = "4.0.4"; // 兜底版本号
+
+        // 版本号对比函数
+        function compareVersions(verA, verB) {
+            const a = verA.split('.').map(Number);
+            const b = verB.split('.').map(Number);
+            for (let i = 0; i < 3; i++) {
+                if (a[i] > b[i]) return -1;
+                if (a[i] < b[i]) return 1;
+            }
+            return 0;
+        }
+
+        // 异步获取最新版本（带代理+超时）
+        async function loadLatestVersion() {
+            // 先设置兜底值，避免加载失败显示异常
+            VERSION_TEXT.textContent = `最新版本：v${FALLBACK_VERSION}`;
+            DOWNLOAD_BTN.href = LATEST_RELEASE_URL;
+
+            try {
+                // 带超时的请求（防止卡死）
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时
+
+                const res = await fetch(GITHUB_API, {
+                    signal: controller.signal,
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json',
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                });
+                clearTimeout(timeoutId);
+
+                if (!res.ok) throw new Error("API请求失败");
+                const releases = await res.json();
+                const fileList = [];
+
+                // 筛选安装包
+                releases.forEach(release => {
+                    if (release.assets && release.assets.length > 0) {
+                        release.assets.forEach(asset => {
+                            const match = asset.name.match(/^Setup_文洲系统清理大师_v(\d+\.\d+\.\d+)\.exe$/i);
+                            if (match) {
+                                fileList.push({
+                                    version: match[1],
+                                    url: asset.browser_download_url
+                                });
+                            }
+                        });
+                    }
+                });
+
+                // 排序选最新
+                if (fileList.length > 0) {
+                    fileList.sort((a, b) => compareVersions(a.version, b.version));
+                    const latest = fileList[0];
+                    VERSION_TEXT.textContent = `最新版本：v${latest.version}`;
+                    DOWNLOAD_BTN.href = latest.url;
+                }
+
+            } catch (err) {
+                // 失败时保持兜底值，不显示错误
+                console.log("版本检测超时/失败，使用兜底版本");
+            }
+        }
+
+        // 页面加载后执行（GitHub Pages加载完成后再请求）
+        if (window.location.hostname !== "localhost" && !window.location.href.startsWith("file://")) {
+            // 非本地环境（GitHub Pages）：延迟1秒请求，避免加载冲突
+            setTimeout(loadLatestVersion, 1000);
+        } else {
+            // 本地环境：直接用兜底版本，不请求API
+            console.log("本地环境，使用兜底版本");
+        }
+
+        // ==============================================
+        // 3D动态星空效果
+        // ==============================================
+        const stars = document.getElementById('stars');
+        const ctx = document.createElement('canvas').getContext('2d');
+        stars.appendChild(ctx.canvas);
+        ctx.canvas.width = window.innerWidth;
+        ctx.canvas.height = window.innerHeight;
+
+        class Star {
+            constructor() { this.reset(); }
+            reset() {
+                this.layer = Math.floor(Math.random() * 3);
+                this.x = Math.random() * ctx.canvas.width;
+                this.y = Math.random() * ctx.canvas.height;
+                this.size = this.layer===0?Math.random()*2+1:(this.layer===1?Math.random()*1.5+0.5:Math.random()*1+0.2);
+                this.speed = this.layer===0?Math.random()*0.8+0.4:(this.layer===1?Math.random()*0.4+0.2:Math.random()*0.2+0.1);
+                this.alpha = Math.random()*0.8+0.2;
+                this.color = this.layer===0?'rgba(0,212,255,':(this.layer===1?'rgba(16,185,129,':'rgba(255,255,255,');
+            }
+            update() {
+                this.y += this.speed;
+                if(this.y>ctx.canvas.height) this.reset();
+                this.alpha = Math.sin(Date.now()*0.001+this.x*0.01)*0.4+0.5;
+            }
+            draw() {
+                ctx.fillStyle = this.color+this.alpha+')';
+                ctx.beginPath();
+                ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+                ctx.fill();
+                if(this.layer===0){
+                    ctx.fillStyle = this.color+(this.alpha*0.3)+')';
+                    ctx.beginPath();
+                    ctx.arc(this.x,this.y,this.size*2,0,Math.PI*2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        const starArray = [];
+        for(let i=0;i<1500;i++) starArray.push(new Star());
+
+        function animateStars() {
+            ctx.fillStyle = 'rgba(9,10,15,0.1)';
+            ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
+            starArray.forEach(s=>{s.update();s.draw();});
+            requestAnimationFrame(animateStars);
+        }
+        animateStars();
+
+        window.addEventListener('resize',()=>{
+            ctx.canvas.width=window.innerWidth;
+            ctx.canvas.height=window.innerHeight;
+            starArray.forEach(s=>s.reset());
+        });
+    </script>
 </body>
 </html>
