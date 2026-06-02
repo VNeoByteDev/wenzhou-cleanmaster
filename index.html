@@ -283,7 +283,6 @@
             <p>谢谢大家支持小学生开发！放心使用~</p>
         </div>
 
-        <!-- 移除href，JS控制直接下载 -->
         <a id="downloadBtn" class="download-btn">📥 立即下载最新版</a>
 
         <div class="author">
@@ -297,7 +296,6 @@
         const DOWNLOAD_BTN = document.getElementById("downloadBtn");
         const VERSION_TEXT = document.getElementById("latest-version");
         const FALLBACK_VERSION = "4.0.4";
-        // v4.0.4固定兜底直链
         const FALLBACK_DOWNLOAD_URL = "https://github.com/VNeoByteDev/wenzhou-cleanmaster/releases/download/v4.0.4/Setup_文洲系统清理大师_v4.0.4.exe";
         let realDownloadUrl = FALLBACK_DOWNLOAD_URL;
 
@@ -311,7 +309,6 @@
             return 0;
         }
 
-        // 点击按钮直接打开下载链接
         DOWNLOAD_BTN.onclick = function(){
             window.open(realDownloadUrl,"_self");
         }
@@ -335,8 +332,8 @@
                 releases.forEach(release => {
                     if (release.assets && release.assets.length > 0) {
                         release.assets.forEach(asset => {
-                            const match = asset.name.match(/^Setup_文洲系统清理大师_v(\d+\.\d+\.\d+)\.exe$/i);
-                            if (match) {
+                            const match = asset.name.match(/v(\d+\.\d+\.\d+)/i);
+                            if (match && asset.name.endsWith('.exe')) {
                                 fileList.push({
                                     version: match[1],
                                     url: asset.browser_download_url
@@ -360,7 +357,6 @@
             setTimeout(loadLatestVersion, 1000);
         }
 
-        // 3D星空代码不变
         const stars = document.getElementById('stars');
         const ctx = document.createElement('canvas').getContext('2d');
         stars.appendChild(ctx.canvas);
