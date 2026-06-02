@@ -257,7 +257,7 @@
 
         <div class="desc">
             清理垃圾、优化内存、加速开机、修复系统问题<br>
-            纯中文界面，无捆绑、无广告、永久免费
+            纯中文界面、无捆绑、无广告、永久免费
         </div>
 
         <div class="update-log">
@@ -296,7 +296,8 @@
         const DOWNLOAD_BTN = document.getElementById("downloadBtn");
         const VERSION_TEXT = document.getElementById("latest-version");
         const FALLBACK_VERSION = "4.0.4";
-        const FALLBACK_DOWNLOAD_URL = "https://github.com/VNeoByteDev/wenzhou-cleanmaster/releases/download/v4.0.4/Setup_文洲系统清理大师_v4.0.4.exe";
+        // ✅ 你提供的正确下载地址
+        const FALLBACK_DOWNLOAD_URL = "https://github.com/VNeoByteDev/wenzhou-cleanmaster/raw/refs/heads/main/Setup_%E6%96%87%E6%B4%B2%E7%B3%BB%E7%BB%9F%E6%B8%85%E7%90%86%E5%A4%A7%E5%B8%88_v4.0.4.exe?download=";
         let realDownloadUrl = FALLBACK_DOWNLOAD_URL;
 
         function compareVersions(verA, verB) {
@@ -309,6 +310,7 @@
             return 0;
         }
 
+        // 点击直接下载
         DOWNLOAD_BTN.onclick = function(){
             window.open(realDownloadUrl,"_self");
         }
@@ -357,6 +359,7 @@
             setTimeout(loadLatestVersion, 1000);
         }
 
+        // ✅ 450颗星星星空效果 完整保留
         const stars = document.getElementById('stars');
         const ctx = document.createElement('canvas').getContext('2d');
         stars.appendChild(ctx.canvas);
